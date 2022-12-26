@@ -1,7 +1,7 @@
 import shutil
 from typing import List
 
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Form
 
 from schemas import UploadVideo
 
@@ -9,10 +9,11 @@ video_router = APIRouter()
 
 
 @video_router.post("/")
-async def root(file: UploadFile = File(...)):
+async def root(title: str = Form(...), description: str = Form(...), file: UploadFile = File(...)):
+    info = UploadVideo(title=title, description=description)
     with open(f'{file.filename}', 'wb') as buffer:
         shutil.copyfileobj(file.file, buffer)
-    return {"file_name": file.filename}
+    return {"file_name": file.filename, 'info': info}
 
 
 @video_router.post("/img")
