@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi import APIRouter, UploadFile, File, Form
 
-from schemas import UploadVideo
+from schemas import UploadVideo, GetVideo, User
 
 video_router = APIRouter()
 
@@ -24,13 +24,15 @@ async def upload_image(files: List[UploadFile] = File(...)):
     return {"file_name": img.filename}
 
 
-@video_router.post("/info")
-async def info_set(info: UploadVideo):
-    return info
+# @video_router.post("/info")
+# async def info_set(info: UploadVideo):
+#     return info
 
 
-@video_router.get("/info")
-async def info_get():
-    title = 'Test'
-    desc = 'Description'
-    return UploadVideo(title=title, description=desc)
+@video_router.get("/video")
+async def get_video():
+    # user = {'id': 25, 'name': 'Doe'}
+    user = User(**{'id': 25, 'name': 'Doe'}) # 2nd option
+    # video = {'title': 'Test', 'description': 'Description'}
+    video = UploadVideo(**{'title': 'Test', 'description': 'Description'})  # 2nd option
+    return GetVideo(user=user, video=video)
