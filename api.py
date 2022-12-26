@@ -30,4 +30,6 @@ async def info_set(info: UploadVideo):
 
 @video_router.get("/info")
 async def info_get():
-    return {'info': 'name', 'int': 3}
+    title = 'Test'
+    desc = 'Description'
+    return UploadVideo(title=title, description=desc)

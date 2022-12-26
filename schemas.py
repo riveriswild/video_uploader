@@ -4,4 +4,4 @@ from typing import List
 class UploadVideo(BaseModel):
     title: str
     description: str
-    tags: List[str]
+    tags: List[str] = None
