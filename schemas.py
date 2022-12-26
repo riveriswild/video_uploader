@@ -16,3 +16,7 @@ class UploadVideo(BaseModel):
 class GetVideo(BaseModel):
     user: User
     video: UploadVideo
+
+
+class Message(BaseModel):
+    message: str
