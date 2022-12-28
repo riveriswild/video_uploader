@@ -6,9 +6,8 @@ from db import metadata, database
 
 
 class MainMeta(ormar.ModelMeta):
-    class Meta:
-        metadata = metadata
-        database = database
+    metadata = metadata
+    database = database
 
 
 class User(ormar.Model):
