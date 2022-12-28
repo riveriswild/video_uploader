@@ -1,5 +1,6 @@
 from starlette.responses import StreamingResponse
 from starlette.templating import Jinja2Templates
+import os
 
 import shutil
 from typing import List
@@ -28,10 +29,7 @@ async def create_video(
         background_tasks.add_task(write_video, file_name, file)
     else:
         raise HTTPException(status_code=418, detail="It isn't mp4")
-
     info = UploadVideo(title=title, description=description)
-    # with open(f'{file.filename}', 'wb') as buffer:
-    #     shutil.copyfileobj(file.file, buffer)
     user = await User.objects.first()
     return await Video.objects.create(file=file.filename, user=user, **info.dict())
 
@@ -54,12 +52,16 @@ async def create_video(
 #     return video
 
 # @video_router.get("/video/{video_pk}", response_model=Video, responses={404: {"model": Message}})
-@video_router.get("/video/{video_pk}", response_model=GetVideo, responses={404: {"model": Message}})
+@video_router.get("/video/{video_pk}", responses={404: {"model": Message}})
 async def get_video(video_pk: int):
-    return await Video.objects.select_related('user').get(pk=video_pk)
+    file = await Video.objects.select_related('user').get(pk=video_pk)
+    print(file)
+    video_path = os.path.join('media', file.dict().get('file'))
+    file_like = open(video_path, mode='rb')
+    return StreamingResponse(file_like, media_type="video/mp4")
 
-@video_router.get("/test")
-async def get_test(req: Request):
-    return {}
+# @video_router.get("/test")
+# async def get_test(req: Request):
+#     return {}
 
 # https://www.youtube.com/watch?v=X2M2LY2Sb78&list=PLaED5GKTiQG-nG7rJiBE8vq9yVEq-5pzm&index=3
