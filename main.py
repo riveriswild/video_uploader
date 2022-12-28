@@ -1,15 +1,10 @@
-import databases
-import sqlalchemy
 from fastapi import FastAPI
 from api import video_router
-import ormar
+from db import database
 
 app = FastAPI()
-metadata = sqlalchemy.MetaData()  # to work with sqlalchemy orm that generates requests
-database = databases.Database("sqlite:///sqlite.db")
+
 app.state.database = database  # add property database to app object
-
-
 @app.on_event("startup")
 async def startup() -> None:
     database_ = app.state.database
