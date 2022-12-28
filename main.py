@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from api import video_router
-from db import database
+from db import database, metadata, engine
 
 app = FastAPI()
 
+metadata.create_all(engine)
 app.state.database = database  # add property database to app object
 @app.on_event("startup")
 async def startup() -> None:
