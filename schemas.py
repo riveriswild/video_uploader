@@ -12,10 +12,13 @@ class UploadVideo(BaseModel):
     description: str
     # tags: List[str] = None
 
-
-class GetVideo(BaseModel):
+class GetListVideo(BaseModel):
+    id: int
+    title: str
+    description: str
+    
+class GetVideo(GetListVideo):
     user: User
-    video: UploadVideo
 
 
 class Message(BaseModel):

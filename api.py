@@ -1,18 +1,17 @@
-from uuid import uuid4
-
-from starlette.responses import StreamingResponse
-from starlette.templating import Jinja2Templates
 import os
-
 import shutil
 from typing import List
 from urllib import response
+from uuid import uuid4
 
-from fastapi import APIRouter, UploadFile, File, Form, Request,HTTPException, BackgroundTasks
-from fastapi.responses import JSONResponse
+from fastapi import (APIRouter, BackgroundTasks, File, Form, HTTPException,
+                     Request, UploadFile)
+from fastapi.responses import JSONResponse, HTMLResponse
+from starlette.responses import StreamingResponse
+from starlette.templating import Jinja2Templates
 
-from schemas import UploadVideo, GetVideo, Message
-from models import Video, User
+from models import User, Video
+from schemas import GetListVideo, GetVideo, Message, UploadVideo
 from services import save_video
 
 video_router = APIRouter()
@@ -31,34 +30,21 @@ async def create_video(
     return await save_video(user, file, title, description, background_tasks)
 
 
-# @video_router.post("/img")
-# async def upload_image(files: List[UploadFile] = File(...)):
-#     for img in files:
-#         with open(f'{img.filename}', 'wb') as buffer:
-#             shutil.copyfileobj(img.file, buffer)
-#     return {"file_name": img.filename}
-
-
-# @video_router.post("/info")
-# async def info_set(info: UploadVideo):
-#     return info
-
-# @video_router.post("/video")
-# async def create_video(video: Video):
-#     await video.save()
-#     return video
-
-# @video_router.get("/video/{video_pk}", response_model=Video, responses={404: {"model": Message}})
-@video_router.get("/video/{video_pk}", responses={404: {"model": Message}})
+@video_router.get("/video/{video_pk}")
 async def get_video(video_pk: int):
     file = await Video.objects.select_related('user').get(pk=video_pk)
-    print(file)
-    video_path = os.path.join('media', file.dict().get('file'))
-    file_like = open(video_path, mode='rb')
+    # video_path = os.path.join('media', file.dict().get('file'))
+    # video_path = os.path.join('media', file.file)
+    file_like = open(file.file, mode='rb')
     return StreamingResponse(file_like, media_type="video/mp4")
 
-# @video_router.get("/test")
-# async def get_test(req: Request):
-#     return {}
 
-# https://www.youtube.com/watch?v=X2M2LY2Sb78&list=PLaED5GKTiQG-nG7rJiBE8vq9yVEq-5pzm&index=3
+@video_router.get('/user/{user_pk}', response_model=List[GetListVideo])
+async def get_list_video(user_pk: int):
+    video_list = await Video.objects.filter(user=user_pk).all()
+    return video_list
+
+
+@video_router.get("index/{video_pk}", response_class=HTMLResponse)
+async def get_video(request: Request, video_pk: int):
+    return templates.TemplateResponse("index.html",{"request": request, "path": video_pk})
