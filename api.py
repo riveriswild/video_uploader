@@ -1,17 +1,15 @@
-import os
-import shutil
 from typing import List
 from urllib import response
 from uuid import uuid4
 
 from fastapi import (APIRouter, BackgroundTasks, File, Form, HTTPException,
                      Request, UploadFile)
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import HTMLResponse
 from starlette.responses import StreamingResponse
 from starlette.templating import Jinja2Templates
 
 from models import User, Video
-from schemas import GetListVideo, GetVideo, Message, UploadVideo
+from schemas import GetListVideo
 from services import open_file, save_video
 
 video_router = APIRouter()
@@ -26,17 +24,8 @@ async def create_video(
         file: UploadFile = File(...)
 ):
     user = await User.objects.first()
-    # file_name = f'media/{user.dict().get("id")}_{uuid4()}.mp4'
     return await save_video(user, file, title, description, background_tasks)
 
-
-# @video_router.get("/video/{video_pk}")
-# async def get_video(video_pk: int):
-#     file = await Video.objects.select_related('user').get(pk=video_pk)
-#     # video_path = os.path.join('media', file.dict().get('file'))
-#     # video_path = os.path.join('media', file.file)
-#     file_like = open(file.file, mode='rb')
-#     return StreamingResponse(file_like, media_type="video/mp4")
 
 
 @video_router.get('/user/{user_pk}', response_model=List[GetListVideo])
